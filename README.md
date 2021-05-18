@@ -12,7 +12,7 @@ O Framebuffer consiste de uma porção de memória que representa os pixeis a se
  - podem utilizar outros framebuffers de outras bibliotecas gráficas, ou até mesmo do hardware.
 
 ```
-void init(int* buffer, int width, int height);
+int* init(int width, int height);
 int refresh();
 ```
 

@@ -1,7 +1,8 @@
 #ifndef FRAMEBUFFER_H
 #define FRAMEBUFFER_H
 
-void init(int* buffer, int width, int height);
+int* create(int width, int height, int pixel_scale);
+void show();
 void refresh();
 
 #endif
