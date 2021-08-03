@@ -11,21 +11,22 @@ int main() {
     const int blue  = 0x0000ff;
     const int white = 0xffffff;
     
-    char width = 32;
-    int* tela = create(width, width, 16);
-    
-    for (int i = 0, n = width * width; i < n; i++) {
-        tela[i] = white;
-    }
+    framebuffer_options opcoes = {
+        .width = 32,
+        .height = 32,
+        .pixel_scale = 16,
+        .verbose = true
+    };
+    framebuffer fb;
+    int* buffer = fb_init(&opcoes, &fb);
 
-    for (int i = 0; i < width; i++) {
-        tela[i * width + i] = blue;
+    for (int i = 0; i < fb.buffer_size; i++) {
+        buffer[i] = white;
     }
-
-    show();
+    fb_update(&fb);
 
     char a;
     cin >> a;
-
+    fb_close(&fb);
     return 0;
 }
