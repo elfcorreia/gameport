@@ -1,14 +1,7 @@
-.PHONY: docs
 
-all: teste.exe
+all: examples
 
-teste.exe: teste.cpp canvas.cpp
-	g++ canvas.cpp teste.cpp -lgdiplus -o teste.exe
+.PHONY: examples
 
-doxygen: docs/Doxyfile
-	cd docs && doxygen Doxyfile && cd -
-
-sphinx:
-	cd docs && make html && cd -
-
-docs: doxygen sphinx
+examples:
+	$(MAKE) -C examples
