@@ -28,7 +28,7 @@ This library was designed for educational purposes in such a way that:
   
   Writes the buffer pointed by `framebuffer` into viewport instance.
 
-- `bool viewport_finished(viewport* instance);`
+- `bool viewport_isfinished(viewport* instance);`
 
   Checks if there is a finish request that can be a close button in a window of a explicit call of `viewport_finish()`
 

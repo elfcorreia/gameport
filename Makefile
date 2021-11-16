@@ -4,4 +4,4 @@ all: examples
 .PHONY: examples
 
 examples:
-	$(MAKE) -C examples
+	$(MAKE) -I "." -C examples
