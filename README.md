@@ -1,38 +1,44 @@
-# Framebuffer Library
+# Viewport Library
 
 This library was designed for educational purposes in such a way that:
 
 * Enables C/C++ programming students works with graphics as early as possible
-* Provides a framebuffer abstraction
+* Graphical approach through the framebuffer abstraction
 * Provides multiple implementations to embrace any student's software resources
 * Easier compilation and linkage
 
 ## Quick start
     
-    fb_viewport(320, 240, "");
+    viewport* v = viewport_create(320, 240, "");
     int buffer[320][240];
-    fb_buffer(buffer, 320, 240);
     buffer[100][50] = 0x0f0ff0;
-    fb_sync(buffer);
-    fb_finish();
+    
+    while (!viewport_finished(v)) {
+      viewport_sync(v, buffer);
+    }
+    viewport_destroy(v);
 
 ## Operations
 
-- `void fb_viewport(int viewport_width, int viewport_height, const char* options);`
+- `viewport* viewport_create(int viewport_width, int viewport_height, const char* options);`
   
-  Initialize and prepares the viewport.
+  Createas and initialize a viewport.
 
-- `void fb_buffer(void* data, int pixels_width, int pixels_height);`
+- `void viewport_sync(viewport* instance, void* framebuffer);`
   
-  Register a new buffer memory pointed by `data` of `width` and `height` pixels.
+  Writes the buffer pointed by `framebuffer` into viewport instance.
 
-- `fb_sync(void* data);`
-  
-  Writes the buffer `data` to the internals buffers.
+- `bool viewport_finished(viewport* instance);`
 
-- `fb_finish();`
+  Checks if there is a finish request that can be a close button in a window of a explicit call of `viewport_finish()`
+
+- `void viewport_finish();`
   
   Finalize the viewport.
+
+- `void viewport_destroy(viewport* instance);`
+
+  Destroy the viewport
 
 ## Details
 
@@ -68,8 +74,3 @@ and can be passed by: `fb_buffer(screen, 32, 32);`
 ### Erro handling
 
 On errors a panic function is called. It's prints a message and terminates the program with a call for `exit(1)`.
-
-### Global state
-
-This library have only one, statically and globaly viewport because this is not an window library.
-
