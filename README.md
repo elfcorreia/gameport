@@ -11,6 +11,8 @@ This library was designed for educational purposes in such a way that:
 
 ## Quick start
 
+Download the library for your system and place in your `main` function.
+
 ```c
 viewport* v = evcreate(320, 240, "");
 int buffer[320][240];
