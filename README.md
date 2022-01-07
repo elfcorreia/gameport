@@ -22,29 +22,9 @@ while (!vevfinished(v)) {
   evsync(v, buffer);
 }
 evdestroy(v);
-
 ```
-## Operations
 
-- `viewport* evcreate(int viewport_width, int viewport_height, const char* options);`
-  
-  Createas and initialize a viewport.
-
-- `void evsync(viewport* instance, void* framebuffer);`
-  
-  Writes the buffer pointed by `framebuffer` into viewport instance.
-
-- `bool evisfinished(viewport* instance);`
-
-  Checks if there is a finish request that can be a close button in a window of a explicit call of `viewport_finish()`
-
-- `void evfinish();`
-  
-  Finalize the viewport.
-
-- `void evdestroy(viewport* instance);`
-
-  Destroy the viewport
+Now you can read the guide, see some examples or dive in it's internal's
 
 ## Guide
 
@@ -80,3 +60,26 @@ It must be always: `framebuffer[lines][columns]`
 ### Erro handling
 
 On errors a panic function is called. It's prints a message and terminates the program with a call for `exit(1)`.
+
+
+### API
+
+- `viewport* evcreate(int viewport_width, int viewport_height, const char* options);`
+  
+  Createas and initialize a viewport.
+
+- `void evsync(viewport* instance, void* framebuffer);`
+  
+  Writes the buffer pointed by `framebuffer` into viewport instance.
+
+- `bool evisfinished(viewport* instance);`
+
+  Checks if there is a finish request that can be a close button in a window of a explicit call of `viewport_finish()`
+
+- `void evfinish();`
+  
+  Finalize the viewport.
+
+- `void evdestroy(viewport* instance);`
+
+  Destroy the viewport
