@@ -1,3 +1,5 @@
+![](https://img.shields.io/github/release/elfcorreia/viewport.svg) ![](https://img.shields.io/github/license/elfcorreia/viewport.svg)
+
 # Viewport Library
 
 This library was designed for educational purposes in such a way that:
