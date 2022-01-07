@@ -1,6 +1,6 @@
 ![](https://img.shields.io/github/release/elfcorreia/viewport.svg) ![](https://img.shields.io/github/license/elfcorreia/viewport.svg)
 
-# Viewport Library
+# EasyView Library
 
 This library was designed for educational purposes in such a way that:
 
@@ -10,39 +10,41 @@ This library was designed for educational purposes in such a way that:
 * Easier compilation and linkage
 
 ## Quick start
-    
-    viewport* v = viewport_create(320, 240, "");
-    int buffer[320][240];
-    buffer[100][50] = 0x0f0ff0;
-    
-    while (!viewport_finished(v)) {
-      viewport_sync(v, buffer);
-    }
-    viewport_destroy(v);
 
+```c
+viewport* v = evcreate(320, 240, "");
+int buffer[320][240];
+buffer[100][50] = 0x0f0ff0;
+
+while (!vevfinished(v)) {
+  evsync(v, buffer);
+}
+evdestroy(v);
+
+```
 ## Operations
 
-- `viewport* viewport_create(int viewport_width, int viewport_height, const char* options);`
+- `viewport* evcreate(int viewport_width, int viewport_height, const char* options);`
   
   Createas and initialize a viewport.
 
-- `void viewport_sync(viewport* instance, void* framebuffer);`
+- `void evsync(viewport* instance, void* framebuffer);`
   
   Writes the buffer pointed by `framebuffer` into viewport instance.
 
-- `bool viewport_isfinished(viewport* instance);`
+- `bool evisfinished(viewport* instance);`
 
   Checks if there is a finish request that can be a close button in a window of a explicit call of `viewport_finish()`
 
-- `void viewport_finish();`
+- `void evfinish();`
   
   Finalize the viewport.
 
-- `void viewport_destroy(viewport* instance);`
+- `void evdestroy(viewport* instance);`
 
   Destroy the viewport
 
-## Details
+## Guide
 
 ### Framebuffer abstraction
 
@@ -62,9 +64,9 @@ A Viewport is an area where the buffer will be rendered. In many situations, to 
 
 Downsampling is not available.
 
-### Framebuffer memory layout
+### Framebuffer
 
-The argument `framebuffer` can be:
+The memory layout of `framebuffer` can be:
 
 - a pointer to a unidimensional array: `int framebuffer[32*32];`
 - a pointer to a bidimensional array: `int framebuffer[32][32];`
