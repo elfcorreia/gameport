@@ -6,4 +6,4 @@ clean:
 	-rm -rf *.exe
 
 %.exe: %.cpp
-	g++ -I .. ../src/x11.cpp $< -pthread -lX11 -o $@
+	$(CCX) -I .. ../build/easyview.a $< $@

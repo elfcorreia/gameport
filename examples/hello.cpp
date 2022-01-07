@@ -1,4 +1,4 @@
-#include "framebuffer.h"
+#include <easyview.h>
 #include <iostream>
 #include <cstring>
 
@@ -15,10 +15,10 @@ int main() {
         tela[i][5] = 0xffffff;
     }
 
-    fb_init(300, 300, "");
-    fb_buffer(tela, 6, 6);
-    fb_sync(tela);
-    fb_finish();
+    ev_init(300, 300, "");
+    ev_buffer(tela, 6, 6);
+    ev_sync(tela);
+    ev_finish();
     
     return 0;
 }
