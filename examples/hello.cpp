@@ -1,6 +1,6 @@
-#include <easyview.h>
 #include <iostream>
 #include <cstring>
+#include "evipo.h"
 
 int main() {
     int tela[6][6];
@@ -15,10 +15,11 @@ int main() {
         tela[i][5] = 0xffffff;
     }
 
-    ev_init(300, 300, "");
-    ev_buffer(tela, 6, 6);
-    ev_sync(tela);
-    ev_finish();
+    viewport* v = vcreate(300, 300, "");
+    while (!visfinished(v)) {
+        vsync(v);
+    }
+    vdestroy(v);
     
     return 0;
 }

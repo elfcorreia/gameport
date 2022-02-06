@@ -6,11 +6,13 @@ function compile_linux_static_lib {
 
 	# Generates object file
 	$(CC) -I . -c $SRC -o build/linux_wayland.obj	
+	
 	# Glue objs in a single file
 	ar ru build/linux_wayland.obj build/easyview.a
+	
 	# Creates a fast index to access objs
 	ranlib build/easyview.a
 }
 
-function make_static_lib {	
-}
+ps -aux | grep /usr/bin/Xwayland > /dev/null
+echo " saida $?"

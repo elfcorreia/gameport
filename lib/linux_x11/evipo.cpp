@@ -1,4 +1,4 @@
-#include "viewport.h"
+#include "evipo.h"
 
 #include <malloc.h>
 #include <stdlib.h>
@@ -9,7 +9,7 @@
 #include <X11/Xutil.h>
 #include <pthread.h>
 
-typedef struct {
+struct viewport {
     unsigned int width;
     unsigned int height;
     Display* display;
@@ -24,16 +24,20 @@ typedef struct {
     unsigned int ximage_width;
     unsigned int ximage_height;
     
-    int main_thread;
+    pthread_t main_thread;
     char finish_requested;
-} viewport;
+};
 
 static void panic(const char* fmt, ...);
 static void verb(const char* fmt, ...);
-static void upsample(int* src, unsigned int width, unsigned height, int* dst, int factor);
-static void x11_main_loop();
+static void upsample(int* src, unsigned int width, 
+    unsigned height, int* dst, int factor);
+static void* x11_main_loop(void*);
 
-viewport* viewport_create(unsigned int width, unsigned int height, const char* options) {
+viewport*
+vcreate(unsigned int width, unsigned int height, 
+    const char* options) {
+
     // Conecta ao servidor X
     Display* display = XOpenDisplay(0);           
     if (display == 0) {
@@ -74,7 +78,7 @@ viewport* viewport_create(unsigned int width, unsigned int height, const char* o
     
     // Cria um contexto gráfico para a janela
     XGCValues gcv;
-    gvc.graphics_exposures = 0;
+    gcv.graphics_exposures = 0;
     GC gc = XCreateGC(display, parent, GCGraphicsExposures, &gcv);
 
     // Exibe a janela
@@ -85,14 +89,14 @@ viewport* viewport_create(unsigned int width, unsigned int height, const char* o
     unsigned int upsampling_factor = 1; 
     unsigned int ximage_width = upsampling_factor * width;
     unsigned int ximage_height = upsampling_factor * height;
-    char* ximage_buffer = (char*) malloc(sizeof(int) * ximage_width * ximage_height);
+    int* ximage_buffer = (int*) malloc(sizeof(int) * ximage_width * ximage_height);
 
     // cria o XImage
     XImage* ximage = XCreateImage(
         display,
         vinfo.visual,
         vinfo.depth,
-        ZPixmap, 0, ximage_buffer,
+        ZPixmap, 0, (char*) ximage_buffer,
         width, height,
         32, 0
     );
@@ -121,27 +125,28 @@ viewport* viewport_create(unsigned int width, unsigned int height, const char* o
     return instance;
 }
 
-void viewport_destroy(viewport* instance) {
+void vdestroy(viewport* instance) {
     free(instance);
 }
 
-void viewport_finish(viewport* instance) {    
+void vfinish(viewport* instance) {    
     instance->finish_requested = 1;
     pthread_join(instance->main_thread, NULL);
 }
 
-void viewport_isfinished(viewport* instance) {
+int visfinished(viewport* instance) {
     return instance->finish_requested == 1;
 }
 
-void viewport_sync(viewport* instance, void* buffer) {
+void vsync(viewport* instance, void* buffer) {
     upsample(
-        buffer, instance->width, instance->height,
+        (int*) buffer, instance->width, instance->height,
         instance->ximage_buffer, instance->upsampling_factor
     );    
 }
 
-static void x11_main_loop(viewport* instance) {    
+static void* x11_main_loop(void* userdata) {
+    viewport* instance = (viewport*) userdata;    
     Atom a;
     XEvent event;
     while (!instance->finish_requested && !XNextEvent(instance->display, &event)) {
@@ -163,7 +168,8 @@ static void x11_main_loop(viewport* instance) {
             );
             break;
         }        
-    }    
+    }
+    return nullptr;
 }
 
 static void verb(const char* fmt, ...) {
@@ -190,8 +196,8 @@ static void panic(const char* fmt, ...) {
 
 static void upsample(int* src, unsigned int src_width, unsigned src_height, int* dst, int factor) {
     int dst_width = src_width * factor;    
-    for (int y = 0; y < src_height; y++) {
-       for (int x = 0; x < src_width; x++) {
+    for (unsigned int y = 0; y < src_height; y++) {
+       for (unsigned int x = 0; x < src_width; x++) {
             for (int ox = 0; ox < factor; ox++) {
                 int tx = x * factor + ox;                
                 for (int oy = 0; oy < factor; oy++) {

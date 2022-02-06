@@ -1,5 +1,5 @@
-#include "framebuffer.h"
 #include <iostream>
+#include "evipo.h"
 
 using std::cin;
 using std::cout;
@@ -19,10 +19,10 @@ int main() {
         }
     }
 
-    fb_init(300, 300, "");
-    fb_buffer(tela, width, height);
-    fb_sync(tela);
-    fb_finish();
-    
+    viewport* v = vcreate(width, height, nullptr);
+    while (!vfinished(v)) {
+        vsync(v);
+    }
+    vdestroy(v);
     return 0;
 }

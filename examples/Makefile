@@ -1,9 +1,5 @@
-all: clean main
+.PHONY: all clean
 
-main: hello.exe xadrez.exe animation.exe
-	
-clean:
-	-rm -rf *.exe
+platform='ops-missing-platform'
 
-%.exe: %.cpp
-	$(CCX) -I .. ../build/easyview.a $< $@
+CXXFLAGS=-I .. ../lib/$(platform)/evipo.a
