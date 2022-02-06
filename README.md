@@ -18,7 +18,7 @@ viewport* v = evcreate(320, 240, "");
 int buffer[320][240];
 buffer[100][50] = 0x0f0ff0;
 
-while (!vevfinished(v)) {
+while (!evfinished(v)) {
   evsync(v, buffer);
 }
 evdestroy(v);
