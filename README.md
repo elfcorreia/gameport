@@ -1,13 +1,8 @@
 ![](https://img.shields.io/github/release/elfcorreia/viewport.svg) ![](https://img.shields.io/github/license/elfcorreia/viewport.svg)
 
-# EasyPort Library
+# EasyView
 
-This library was designed for educational purposes in such a way that:
-
-* Enables C/C++ programming students works with graphics as early as possible
-* Graphical approach through the framebuffer abstraction
-* Provides multiple implementations to embrace any student's software resources
-* Easier compilation and linkage
+EasyView cames from "easy viewport" and was designed to provide a viewport for framebuffers. 
 
 ## Quick start
 
