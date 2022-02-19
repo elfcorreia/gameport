@@ -1,3 +1,5 @@
+# TODO: clang, .so, cmake?
+
 .PHONY: all clean
 
 CXXFLAGS=-Wall -pedantic -fPIC -I ../..

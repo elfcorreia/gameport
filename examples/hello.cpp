@@ -3,23 +3,27 @@
 #include "evipo.h"
 
 int main() {
-    int tela[6][6];
+    int tela[480][480];
     memset(tela, 0xffffff, sizeof(tela));
 
-    for (int i = 0; i < 6; i++) {
-        tela[i][0] = 0xff0000;
-        tela[i][1] = 0xffff00;
-        tela[i][2] = 0x00ff00;
-        tela[i][3] = 0x00ffff;
-        tela[i][4] = 0x0000ff;
-        tela[i][5] = 0xffffff;
+    int cores[] = {
+        0x000000, 0xff0000, 0x00ff00, 0x0000ff,
+        0xffff00, 0xff00ff, 0xffffff, 0x00ffff
+    };
+
+    for (int i = 0; i < 480; i++) {
+        for (int j = 0; j < 480; j++) {
+            int cor = cores[j / 60];
+            tela[i][j] = cor;
+        }
     }
 
-    viewport* v = vcreate(300, 300, "");
-    while (!visfinished(v)) {
-        vsync(v);
-    }
-    vdestroy(v);
+    viewport* v = vcreate(480, 480, "verbose");
     
+    // one shot sync
+    vsync(v, tela);
+    while (!getc(stdin) == 'd');
+    
+    vdestroy(v);    
     return 0;
 }

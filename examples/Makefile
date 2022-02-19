@@ -1,5 +1,9 @@
 .PHONY: all clean
 
-platform='ops-missing-platform'
+CXXFLAGS=evipo.o -pthread -lX11 
 
-CXXFLAGS=-I .. ../lib/$(platform)/evipo.a
+clean:
+	-rm hello.o hello pixel_size.o pixel_size
+
+all: hello pixel_size
+
