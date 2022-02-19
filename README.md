@@ -1,33 +1,42 @@
 ![](https://img.shields.io/github/release/elfcorreia/viewport.svg) ![](https://img.shields.io/github/license/elfcorreia/viewport.svg)
 
-# EasyView
+## Introduction
 
-EasyView cames from "easy viewport" and was designed to provide a viewport for framebuffers. 
+Evipo cames from "easy viewport" and was designed to provide a viewport for framebuffers.
 
 ## Quick start
 
-Download the library for your system and place in your `main` function.
+Place the `evipo.h` and the `evipo.c` for your compile and platform and write something like:
 
 ```c
-viewport* v = evcreate(320, 240, "");
-int buffer[320][240];
-buffer[100][50] = 0x0f0ff0;
+const int width = 320;
+const int height = 240;
+const int darkcafe = 0x3b2f2f;
+viewport* v = evcreate(width, heigth, "verbose");
 
-while (!evfinished(v)) {
-  evsync(v, buffer);
-}
+int framebuffer[width][heigth];
+framebuffer[100][50] = darkcafe;
+
+evsync(v, buffer);
+getc(stdin);
 evdestroy(v);
 ```
 
-Now you can read the guide, see some examples or dive in it's internal's
+Now you can read more, see some examples or read the source.
 
-## Guide
+## Framebuffer and Viewport abstractions
 
-### Framebuffer abstraction
+The framebuffer abstraction consist of a piece of memory (buffer) to store pixels that will be render on a viewport. This viewport is platform dependent. So, it can be an X11 window, a Win32 window or an OpenGL context.
 
-The framebuffer abstraction consist of a piece of memory (buffer) to store pixels that will be render on a graphical device. This graphical device is platform dependent. So can be an X11 window, a Win32 window or an OpenGL context.
+The memory layout of an `framebuffer` should be one of:
 
-### Pixels and colors
+- a pointer to a unidimensional array: `int framebuffer[width*height];`
+- a pointer to a bidimensional array: `int framebuffer[width][height];`
+- a pointer to a heap allocated memory: `int* framebuffer = new int[width*height];`
+
+The memory layout of framebuffer MUST BE row-first: `framebuffer[lines][columns]`
+
+## Pixels and colors
 
 Each pixel color is represented by an RGB value in an `int`. Is easy to think in colors using hexadecimal literals, like HTML colors:
 
@@ -35,46 +44,28 @@ Each pixel color is represented by an RGB value in an `int`. Is easy to think in
     int green = 0x00ff00;
     int blue = 0x0000ff;
 
-### Viewport size and buffer size
-
-A Viewport is an area where the buffer will be rendered. In many situations, to render an buffer of 320 by 240 in a viewport of 320 by 240 is trivial. However, you can too render an buffer of 9x9 pixels in a viewport of 100x100. In such situations the viewport makes an upsampling. 
-
-Downsampling is not available.
-
-### Framebuffer
-
-The memory layout of `framebuffer` can be:
-
-- a pointer to a unidimensional array: `int framebuffer[32*32];`
-- a pointer to a bidimensional array: `int framebuffer[32][32];`
-- a pointer to a heap allocated memory: `int* framebuffer = new int[32*32];`
-- etc...      
-
-It must be always: `framebuffer[lines][columns]`
-
-### Erro handling
+## Erro handling
 
 On errors a panic function is called. It's prints a message and terminates the program with a call for `exit(1)`.
 
+## API
 
-### API
-
-- `viewport* evcreate(int viewport_width, int viewport_height, const char* options);`
+- `viewport* evcreate(unsigned int width, unsigned int height, const char* options);`
   
-  Createas and initialize a viewport.
+  Creates and initialize a new viewport object.
 
 - `void evsync(viewport* instance, void* framebuffer);`
   
-  Writes the buffer pointed by `framebuffer` into viewport instance.
+  Does the magic.
 
 - `bool evisfinished(viewport* instance);`
 
-  Checks if there is a finish request that can be a close button in a window of a explicit call of `viewport_finish()`
+  Checks if there is a finish request triggered. A finish request can be trigger by a user or by a call of `evfinish`;
 
 - `void evfinish();`
   
-  Finalize the viewport.
+  Trigger a finish request.
 
 - `void evdestroy(viewport* instance);`
 
-  Destroy the viewport
+  Destroy the viewport object.
