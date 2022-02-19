@@ -26,7 +26,7 @@ Now you can read more, see some examples or read the source.
 
 ## Framebuffer and Viewport abstractions
 
-The framebuffer abstraction consist of a piece of memory (buffer) to store pixels that will be render on a viewport. This viewport is platform dependent. So, it can be an X11 window, a Win32 window or an OpenGL context.
+The *framebuffer* abstraction consist of a piece of memory (buffer) to store pixels that will be render on a *viewport*. This *viewport* is platform dependent. So, it can be an X11 window, a Win32 window or an OpenGL context.
 
 The memory layout of an `framebuffer` should be one of:
 
