@@ -1,9 +1,7 @@
 .PHONY: all clean
 
-CXXFLAGS=evipo.o -pthread -lX11 
+CFLAGS=-lX11 -levipo
+CXXFLAGS=-lX11 -levipo
 
 clean:
-	-rm hello.o hello pixel_size.o pixel_size
-
-all: hello pixel_size
-
+	find . -name "*.o" -or -executable -delete

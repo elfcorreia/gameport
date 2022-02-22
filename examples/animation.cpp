@@ -1,6 +1,6 @@
+#include "evipo.hpp"
 #include <iostream>
 #include <cstring>
-#include "evipo.h"
 
 int main() {
     int tela[50][50];
