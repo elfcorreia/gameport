@@ -1,2 +1,3 @@
 all:
-	$(MAKE) -C lib
+	$(MAKE) -C implementations
+	$(MAKE) -C examples

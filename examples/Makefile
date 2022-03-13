@@ -1,7 +1,7 @@
 .PHONY: all clean
 
-CFLAGS=-lX11 -levipo
-CXXFLAGS=-lX11 -levipo
+CFLAGS=-I. -L. -lX11 -lgameport  -Wl,-rpath='$${ORIGIN}'
+CXXFLAGS=-I. -L. -lX11 -lgameport -Wl,-rpath='$${ORIGIN}'
 
 clean:
-	find . -name "*.o" -or -executable -delete
+	find . -name "*.o" -or -executable -not -name "*.so" -delete
