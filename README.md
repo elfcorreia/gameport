@@ -21,17 +21,9 @@ gameport_destroy(gp);
 ```
 build your code with the instructions of your target platform.
 
-### Display Graphics through a Framebuffer
+### Display graphics through a framebuffer
 
-The *framebuffer* abstraction consist of a piece of memory (buffer) to store the pixels that will be rendered on a *viewport*. This *viewport* is platform dependent. So, it can be an X11 window, a Win32 window or an OpenGL context.
-
-The memory layout of an `framebuffer` should be one of:
-
-- a pointer to a unidimensional array: `int framebuffer[width*height];`
-- a pointer to a bidimensional array: `int framebuffer[width][height];`
-- a pointer to a heap allocated memory: `int* framebuffer = new int[width*height];`
-
-The memory layout of framebuffer is row major: `framebuffer[lines][columns]`
+In the gameport you will need a *framebuffer* to display your graphics. A *framebuffer* is a memor (buffer) thats stores the pixels that will be rendered (a frame). The *framebuffer* concept is ans abstraction. However, showing this frame it's not, it can be an X11 window, a Win32 window or an OpenGL context, for example.
 
 ### Pixels and colors
 
@@ -42,12 +34,28 @@ Each pixel color is represented by an 32-bits RGBA value (an `int`). Is easy to 
     int green = 0x00ff00;
     int blue = 0x0000ff;
 ```
-### Viewport size and pixel size
 
-A viewport is an area where the framebuffer will be rendered. In many situations, a 1:1 escale is desired, for example, to render an framebuffer of 320 by 240 in a viewport of 320 by 240 is trivial. However, for a framebuffer of 32x32 pixels is better visualized in an 320x320 pixels viewport. This is possible by scalling pixels.
+### The memory layout of a framebuffer
+
+The memory layout of an `framebuffer` should be one of:
+
+- a pointer to a unidimensional array: `int framebuffer[width*height];`
+- a pointer to a bidimensional array: `int framebuffer[width][height];`
+- a pointer to a heap allocated memory: `int* framebuffer = new int[width*height];`
+
+The memory layout of framebuffer is row major: `framebuffer[lines][columns]`
+
+### Framebuffer size and viewport size
+
+A *viewport* is an area where the *framebuffer* will be rendered and not necessarily their sizes matches exactly. 
+
+A trivial case is a 320x200 *framebuffer* in a 320x200 *viewport*.
+
+A case in such you are working with a 32x32 *framebuffer* and want to visualize it
+
+Other case is a 320x200 *framebuffer* in a 640x400 *viewport*.
 
     gameport_create(32, 32, "verbose;pixel_scale=1")
-
     gameport_create(320, 320, "verbose;pixel_scale=10")
 
 ## Erro handling
