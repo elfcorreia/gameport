@@ -6,7 +6,9 @@ Gameport is a tiny multiplatform C/C++ library that's aims to enable programmers
 
 ## Quick start
 
-Download the `gameport.h` and the `gameport.c` corresponding to your target platform and write the program:
+Download the `gameport.h` and the `gameport.c` corresponding to your target platform.
+
+Write the following program:
 
 ```c
 int buffer[320][200];
@@ -17,8 +19,7 @@ gameport_draw(gp, buffer);
 scanf("%*s");
 gameport_destroy(gp);
 ```
-
-To build your code you will need to check the instructions of your target platform.
+build your code with the instructions of your target platform.
 
 ### Display Graphics through a Framebuffer
 
