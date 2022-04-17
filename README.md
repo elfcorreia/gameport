@@ -14,16 +14,16 @@ Write the following program:
 int buffer[320][200];
 buffer[100][50] = 0x0f0ff0;
 
-gameport* gp = gameport_create(320, 200, "verbose");
+gameport_t* gp = gameport_create(320, 200, "verbose");
 gameport_draw(gp, buffer);
 scanf("%*s");
 gameport_destroy(gp);
 ```
 build your code with the instructions of your target platform.
 
-### Display graphics through a framebuffer
+### Display graphics through a framebuffer abstraction
 
-In the gameport you will need a *framebuffer* to display your graphics. A *framebuffer* is a memor (buffer) thats stores the pixels that will be rendered (a frame). The *framebuffer* concept is ans abstraction. However, showing this frame it's not, it can be an X11 window, a Win32 window or an OpenGL context, for example.
+In the gameport you will need a *framebuffer* to display your graphics. A *framebuffer* is a piece of memory (buffer) thats stores the pixels that will be rendered in the graphical output. While the *framebuffer* is an abstraction, showing it it's not. We have many ways of display graphics, an X11 window, a Win32 window, an OpenGL context, for example. This platform provides aims to provide this abstraction. So you can start rigth now programming with graphics. And if you want learn the internals you have a tiny library implementation source code ready to dive in.
 
 ### Pixels and colors
 
@@ -37,7 +37,7 @@ Each pixel color is represented by an 32-bits RGBA value (an `int`). Is easy to 
 
 ### The memory layout of a framebuffer
 
-The memory layout of an `framebuffer` should be one of:
+In this library, the memory is up to you. The memory layout of an `framebuffer` should be one of:
 
 - a pointer to a unidimensional array: `int framebuffer[width*height];`
 - a pointer to a bidimensional array: `int framebuffer[width][height];`
@@ -64,18 +64,18 @@ On errors a panic function is called. It's prints a message and terminates the p
 
 ### API
 
-- `gameport* gameport_create(int viewport_width, int viewport_height, const char* options);`
+- `gameport_t* gameport_create(int width, int height, const char* options);`
   
   Creates a new gameport instance
   
-- `void gameport_draw(gameport* instance, void* framebuffer);`
+- `void gameport_draw(gameport_t* instance, void* framebuffer);`
   
   Draws the `framebuffer` memory in the gameport's viewport.
 
-- `int gameport_next_event(gameport* instance, gameport_event* out_event);`
+- `int gameport_next_event(gameport_t* instance, gameport_event* out_event);`
   
   Feed the `out_event` structure with the next event.
 
-- `void gameport_destroy(viewport* instance);`
+- `void gameport_destroy(gameport_t* instance);`
   
   Destroy the gameport `instance`
