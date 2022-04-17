@@ -16,21 +16,23 @@ extern "C" {
 #define GAMEPORT_MOUSESCROLL	35
 #define GAMEPORT_EXIT			90
 
-struct gameport_event {
+struct gameport_event_s {
 	char type;
 	int x, y;
 	char key_char;
 	int key_code;
 };
+typedef struct gameport_event_s gameport_event_t;
 
-struct gameport;
-struct gameport* gameport_create(unsigned int viewport_width, unsigned int viewport_height, const char* options);
-	void  gameport_draw(struct gameport const* instance, void* framebuffer);
-	 int  gameport_next_event(struct gameport* instance, struct gameport_event* out_event);
-	void  gameport_destroy(struct gameport* instance);
-
-#endif
+struct gameport_s;
+typedef struct gameport_s gameport_t;
+gameport_t* gameport_create(unsigned int viewport_width, unsigned int viewport_height, const char* options);
+	void  gameport_draw(gameport_t const* instance, void* framebuffer);
+	 int  gameport_next_event(gameport_t* instance, gameport_event_t* out_event);
+	void  gameport_destroy(gameport_t* instance);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

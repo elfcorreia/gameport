@@ -54,10 +54,10 @@ A trivial case is a 320x200 *framebuffer* in a 320x200 *viewport*.
 A case in such you are working with a 32x32 *framebuffer* and want to visualize it
 
 Other case is a 320x200 *framebuffer* in a 640x400 *viewport*.
-
+```c
     gameport_create(32, 32, "verbose;pixel_scale=1")
     gameport_create(320, 320, "verbose;pixel_scale=10")
-
+```
 ## Erro handling
 
 On errors a panic function is called. It's prints a message and terminates the program with a call for `exit(1)`.

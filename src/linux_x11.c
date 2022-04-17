@@ -1,3 +1,19 @@
+/**
+ * 
+ * How to compile to an Object File:
+ * 
+ * $ cc -Wall -pedantic -fPIC -I .. -c linux_x11.c -o gameport.o
+ * 
+ * How to build a Shared Library:
+ * 
+ * $ cc -Wall -pedantic -fPIC -I .. -shared linux_x11.c -o libgameport.so
+ * 
+ * How to build a Static Library:
+ * 
+ * $ cc -Wall -pedantic -fPIC -I .. -c linux_x11.c -o gameport.o
+ * $ ar rcs libgameport.a gameport.o
+ * 
+ */
 #include "gameport.h"
 
 #include <malloc.h>
@@ -9,11 +25,11 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-static void panic(struct gameport const* instance, const char* fmt, ...);
-static void verb(struct gameport const* instance, const char* fmt, ...);
-static void parse_options(struct gameport* instance, const char* str);
+static void panic(gameport_t const* instance, const char* fmt, ...);
+static void verb(gameport_t const* instance, const char* fmt, ...);
+static void parse_options(gameport_t* instance, const char* str);
 
-struct gameport {
+struct gameport_s {
     unsigned int width;
     unsigned int height;
     Display* display;
@@ -31,8 +47,8 @@ struct gameport {
     char finish_requested;
 };
 
-struct gameport* gameport_create(unsigned int width, unsigned int height, const char* options) {    
-    struct gameport* instance = (struct gameport*) malloc(sizeof(struct gameport));
+gameport_t* gameport_create(unsigned int width, unsigned int height, const char* options) {    
+    gameport_t* instance = (gameport_t*) malloc(sizeof(gameport_t));
     instance->verbose = false;
     instance->width = width;
     instance->height = height;
@@ -41,29 +57,29 @@ struct gameport* gameport_create(unsigned int width, unsigned int height, const 
     // Conecta ao servidor X
     Display* display = XOpenDisplay(0);
     if (display == 0) {
-        panic(instance, "[gameport] - creating port: XOpenDisplay() returned 0\n");
+        panic(instance, "gameport_create: XOpenDisplay() returned 0\n");
     }
-    verb(instance, "[gameport] - creating port: display %p opened\n", display);
+    verb(instance, "gameport_create: display %p opened\n", display);
 
     // Recupera informações visuais
     XVisualInfo vinfo;
     if (!XMatchVisualInfo(display, XDefaultScreen(display), 24, TrueColor, &vinfo)) {
-        panic(instance, "[gameport] - creating port: No 24-bits TrueColor visual\n");
+        panic(instance, "gameport_create: No 24-bits TrueColor visual\n");
     }
-    verb(instance, "[gameport] - creating port: visual info retrieved depth=%u bits_per_rgb=%u rgb_bitmask=(%x, %x, %x)\n", 
+    verb(instance, "gameport_create: visual info retrieved depth=%u bits_per_rgb=%u rgb_bitmask=(%x, %x, %x)\n", 
         vinfo.depth, vinfo.bits_per_rgb,
         vinfo.red_mask, vinfo.green_mask, vinfo.blue_mask
     );
 
     // Recupera a janela superior da hierarquia de janelas
     Window parent = XDefaultRootWindow(display);
-    verb(instance, "[gameport] - creating port: default root window %u\n", parent);
+    verb(instance, "gameport_create: default root window %u\n", parent);
 
     // Atributos da janela
     XSetWindowAttributes attrs;
     // Configura o mapa de cores
     attrs.colormap = XCreateColormap(display, parent, vinfo.visual, AllocNone);
-    verb(instance, "[gameport] - creating port: colormap created using visual info\n");
+    verb(instance, "gameport_create: colormap created using visual info\n");
 
     // Cria a janela
     Window window = XCreateWindow(
@@ -74,10 +90,10 @@ struct gameport* gameport_create(unsigned int width, unsigned int height, const 
         CWBackPixel | CWColormap | CWBorderPixel,
         &attrs
     );
-    verb(instance, "[gameport] - creating port: window %u created\n", window);
+    verb(instance, "gameport_create: window %u created\n", window);
 
     // desabilita redimensionamento
-    verb(instance, "[gameport] - disabling resizing of window\n");
+    verb(instance, "gameport_create: disabling resizing of window\n");
     XSizeHints size_hints;
     size_hints.flags = PMinSize | PMaxSize;
     size_hints.min_width = width;
@@ -88,33 +104,30 @@ struct gameport* gameport_create(unsigned int width, unsigned int height, const 
 
     // Registra os eventos que desejamos observar na janela
     XSelectInput(display, window, ExposureMask | KeyPressMask);
-    verb(instance, "[gameport] - creating port: Exposure and KeyPress events selected\n");
+    verb(instance, "gameport_create: Exposure and KeyPress events selected\n");
 
     // Registra o evento de fechar janela
     Atom wm_delete_window = XInternAtom(display, "WM_DELETE_WINDOW", False);
     XSetWMProtocols(display, window, &wm_delete_window, 1);
-    verb(instance, "[gameport] - creating port: wm_delete_window event registered\n");
+    verb(instance, "gameport_create: wm_delete_window event registered\n");
 
     // Cria um contexto gráfico para a janela
     XGCValues gcv;
     gcv.graphics_exposures = 0;
     GC gc = XCreateGC(display, parent, GCGraphicsExposures, &gcv);
-    verb(instance, "[gameport] - creating port: graphic context %u created\n", gc);
+    verb(instance, "gameport_create: graphic context %u created\n", gc);
 
     // Exibe a janela
-    verb(instance, "[gameport] - creating port: showing window...\n");
+    verb(instance, "gameport_create: showing window...\n");
     XMapWindow(display, window);
     XSync(display, false);    
 
     // cria o buffer
-    //unsigned int upsampling_factor = 1; 
-    //unsigned int ximage_width = upsampling_factor * width;
-    //unsigned int ximage_height = upsampling_factor * height;
     unsigned int ximage_buffer_size = sizeof(int) * width * height;
     int* ximage_buffer = (int*) malloc(ximage_buffer_size);
-    verb(instance, "[gameport] - creating port: ximage buffer created (width=%upx, height=%upx, size=%u bytes) at %p\n", width, height, sizeof(int)*width*height, ximage_buffer);
+    verb(instance, "gameport_create: ximage buffer created (width=%upx, height=%upx, size=%u bytes) at %p\n", width, height, sizeof(int)*width*height, ximage_buffer);
 
-    // cria o XImage
+    // cria um objeto XImage
     XImage* ximage = XCreateImage(
         display,
         vinfo.visual,
@@ -124,9 +137,9 @@ struct gameport* gameport_create(unsigned int width, unsigned int height, const 
         32, 0
     );
     if (!ximage) {
-        panic(instance, "[gameport] - creating port: XCreateImage returned %u\n", ximage);
+        panic(instance, "gameport_create: XCreateImage returned %u\n", ximage);
     };
-    verb(instance, "[gameport] - creating port: ximage created\n");
+    verb(instance, "gameport_create: ximage created\n");
     
     // guardas as informações para serem utilizadas futuramente em outra operações    
     instance->display = display;
@@ -142,8 +155,8 @@ struct gameport* gameport_create(unsigned int width, unsigned int height, const 
     return instance;
 }
 
-void gameport_draw(struct gameport const* instance, void* buffer) {
-    verb(instance, "[gameport] - drawing %u bytes of buffer=%p into instance=%p\n", instance->ximage_buffer_size, buffer, instance);
+void gameport_draw(gameport_t const* instance, void* buffer) {
+    verb(instance, "gameport_draw: drawing %u bytes of buffer=%p into instance=%p\n", instance->ximage_buffer_size, buffer, instance);
     memcpy(instance->ximage_buffer, buffer, instance->ximage_buffer_size);
     int* ibuf = (int*) buffer;
     int* xbuf = (int*) instance->ximage_buffer;
@@ -158,11 +171,11 @@ void gameport_draw(struct gameport const* instance, void* buffer) {
     XSync(instance->display, 0);
 }
 
-int gameport_next_event(struct gameport* instance, struct gameport_event* out_event) {
+int gameport_next_event(gameport_t* instance, gameport_event_t* out_event) {
     out_event->type = GAMEPORT_NONE;
 
     if (instance->finish_requested) {
-        verb(instance, "[gameport] - finish event received\n");
+        verb(instance, "gameport_next_event: finish event received\n");
         out_event->type = GAMEPORT_EXIT;
         return 1;        
     }
@@ -175,12 +188,12 @@ int gameport_next_event(struct gameport* instance, struct gameport_event* out_ev
             a = (Atom) event.xclient.data.l[0];
             is_a_wm_delete_window_event = a == instance->wm_delete_window;
             if (is_a_wm_delete_window_event) {
-                verb(instance, "[gameport] - finish event received\n");
+                verb(instance, "gameport_next_event: finish event received\n");
                 out_event->type = GAMEPORT_EXIT;
                 break;
             }
         case Expose:
-            verb(instance, "[gameport] - draw event received\n");
+            verb(instance, "gameport_next_event: draw event received\n");
             out_event->type = GAMEPORT_DRAW;
             break;
         }
@@ -188,34 +201,34 @@ int gameport_next_event(struct gameport* instance, struct gameport_event* out_ev
     return out_event->type != GAMEPORT_NONE;
 }
 
-void gameport_destroy(struct gameport* instance) {
-    verb(instance, "[gameport] - destroying %p\n", instance);
+void gameport_destroy(gameport_t* instance) {
+    verb(instance, "gameport_destroy: destroying %p\n", instance);
     free(instance);
 }
 
-static void verb(struct gameport const* instance, const char* fmt, ...) {
+static void verb(gameport_t const* instance, const char* fmt, ...) {
     char msg[50];
     time_t agora = time(NULL);
     strftime(msg, sizeof(msg), "%T", localtime(&agora));
-    fprintf(stderr, "%s - ", msg);
+    fprintf(stderr, "V %s [GAMEPORT] ", msg);
     va_list args;
     va_start(args, fmt);
     vfprintf(stderr, fmt, args);
     va_end(args); 
 }
 
-static void panic(struct gameport const* instance, const char* fmt, ...) {
+static void panic(gameport_t const* instance, const char* fmt, ...) {
     char msg[50];
     time_t agora = time(NULL);
     strftime(msg, sizeof(msg), "%T", localtime(&agora));
-    fprintf(stderr, "%s - PANIC! ", msg);
+    fprintf(stderr, "P %s [GAMEPORT] ", msg);
     va_list args;
     va_start(args, fmt);
     vfprintf(stderr, fmt, args);
     va_end(args);
 }
 
-static void parse_options(struct gameport* instance, const char *str) {
+static void parse_options(gameport_t* instance, const char *str) {
     if (!str) return;
     char buf[513];
     strncpy(buf, str, 512);
